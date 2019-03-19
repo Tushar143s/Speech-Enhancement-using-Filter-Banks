@@ -403,9 +403,10 @@ def addCascadedOutputs(list1, list2, m, n=0):
 	# Adds 2 lists as:
 	# newList = list1[:m] + sum of (list1[m:], list2[:m]) elements + list2[m:]
 
-	newList = list1[:m] + add_elements(list1[m:], list2[:m]) + list2[m:]
+	# newList = list1[:m] + add_elements(list1[m:], list2[:m]) + list2[m:]
+	print(len(list1[:-m]), len(list1[-m:]),len(list2[:m]), len(list1[m:]))
 
-	return newList
+	# return newList
 
 
 def add_elements(list1, list2):
