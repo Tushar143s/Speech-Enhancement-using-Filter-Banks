@@ -115,19 +115,7 @@ filtered_x = lfilter(taps, 1.0, x)
 
 # The phase delay of the filtered signal.
 
-delay = 0.5 * (N-1) / sample_rate
 
-figure(1)
-# Plot the original signal.
-plot(t, x, label='original signal')
-# Plot the filtered signal, shifted to compensate for the phase delay.
-plot(t-delay, filtered_x, 'r-', label='shifted signal')
-# Plot just the "good" part of the filtered signal.  The first N-1
-# samples are "corrupted" by the initial conditions.
-plot(t[N-1:]-delay, filtered_x[N-1:], 'g', linewidth=4, label='filtered signal')
-legend()
-xlabel('t')
-grid(True)
 
 # show()
 
@@ -170,15 +158,15 @@ iir_output = butter_bandpass_filter(x, low, high, sample_rate)
 
 # Multirate
 
-# import sys
-# import fractions
-# import numpy
-# from scipy import signal
-# from numpy import cos, sin, pi, absolute, arange, asarray, array, log10
-# # from sp import multirate4
-# from scipy.signal import kaiserord, lfilter, firwin, freqz, iirfilter, freqs, butter
-# from pylab import figure, clf, plot, xlabel, ylabel, xlim, ylim, title, grid, axes, show, legend
-# from random import randint as ri
+import sys
+import fractions
+import numpy
+from scipy import signal
+from numpy import cos, sin, pi, absolute, arange, asarray, array, log10
+# from sp import multirate4
+from scipy.signal import kaiserord, lfilter, firwin, freqz, iirfilter, freqs, butter
+from pylab import figure, clf, plot, xlabel, ylabel, xlim, ylim, title, grid, axes, show, legend
+from random import randint as ri
 
 
 # # sample_rate = 44000 # set sample rate between 9 kHz to 11 kHz (original: 44 kHz)
@@ -600,21 +588,60 @@ multirate_output = cascadedMultiRate(x, nyq_rate, N=11)
 
 # 1. Fir vs IIR vs Original Signal output
 
+figure(1)
+
+delay = 0.5 * (N-1) / sample_rate
+
+# Plot the original signal.
+plot(t, x, label='original signal')
+# Plot just the "good" part of the filtered signal.  The first N-1
+# samples are "corrupted" by the initial conditions.
+plot(t[N-1:]-delay, filtered_x[N-1:], 'green', linewidth=4, label='filtered signal of fir')
+plot(t, iir_output, 'yellow', linewidth=4, label='filtered signal of iir')
+legend()
+xlabel('t')
+grid(True)
+
 # 2. Fir vs Original Signal 
+
+figure(2)
+# Plot the original signal.
+plot(t, x, label='original signal')
+# Plot the filtered signal, shifted to compensate for the phase delay.
+plot(t-delay, filtered_x, 'r-', label='shifted signal')
+# Plot just the "good" part of the filtered signal.  The first N-1
+# samples are "corrupted" by the initial conditions.
+plot(t[N-1:]-delay, filtered_x[N-1:], 'g', linewidth=4, label='filtered signal')
+legend()
+xlabel('t')
+grid(True)
 
 # 3. Fir vs Multirate vs Original Signal
 
-# 4. Multirate vs Original Signal
-delay = 0.5 * (N-1) / sample_rate
-
-# figure(1)
+figure(3)
 # Plot the original signal.
-# Plot the filtered signal, shifted to compensate for the phase delay.
-# plot(t-delay, filtered_x, 'r-', label='shifted signal')
+plot(t, x, label='original signal')
+# Plot Multirate output
+plot(t, multirate_output[:len(t)], 'black', label='multirate output signal')
+# Plot Fir Output
 # Plot just the "good" part of the filtered signal.  The first N-1
 # samples are "corrupted" by the initial conditions.
-# plot(t[N-1:]-delay, filtered_signal[N-1:], 'g', linewidth=4, label='filtered signal')
-# legend()
-# xlabel('t')
-# grid(True)
-# show()
+plot(t[N-1:]-delay, filtered_x[N-1:], 'g', linewidth=4, label='filtered signal')
+legend()
+xlabel('t')
+grid(True)
+
+
+# 4. Multirate vs Original Signal
+
+figure(4)
+# Plot the original signal.
+plot(t, x, label='original signal')
+# Plot Multirate output
+plot(t, multirate_output[:len(t)], 'black', label='multirate output signal')
+
+legend()
+xlabel('t')
+grid(True)
+
+show()
