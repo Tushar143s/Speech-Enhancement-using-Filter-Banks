@@ -377,36 +377,42 @@ def cascadedMultiRate(x, nyq_rate, N=11):
 
 	### /Stage 6: low = 14.9 kHz, high = 20 kHz
 
-	print(len(filtered_signal_highpass1))
-	# figure(1)
-	# plot(filtered_signal_highpass1, 'r-', label='shifted signal')
 
-	print(">>>>>>>", addCascadedOutputs(filtered_signal_highpass1, filtered_signal_highpass2, 5))
-	print(len(filtered_signal_highpass2))
-	print(len(filtered_signal_highpass3))
-	print(len(filtered_signal_highpass4))
-	print(len(filtered_signal_highpass5))
-	print(len(filtered_signal_highpass6))
+	
 
 
 	# 5. Add the signals to get output signals
 
-
-	# Todo
+	# output of cascaded mn stages, where the overlapping samples are added
+	cascaded12 = addCascadedOutputs(filtered_signal_highpass1, filtered_signal_highpass2, 5)
+	cascaded123 = addCascadedOutputs(cascaded12, filtered_signal_highpass3, 100)
+	cascaded1234 = addCascadedOutputs(cascaded12, filtered_signal_highpass4, 100)
+	cascaded12345 = addCascadedOutputs(cascaded12, filtered_signal_highpass5, 100)
+	cascaded123456 = addCascadedOutputs(cascaded12, filtered_signal_highpass6, 100)
 
 	#----------------------------------------------------------------------------
 
-	pass
+	# Display the graph
+	print(len(cascaded123456))
+	figure(1)
+	plot(t, x, label='original signal')
+	plot(t, cascaded123456[:len(t)], 'r-', label='multirate output signal')
+	legend()
+	show()
+
 
 
 def addCascadedOutputs(list1, list2, m, n=0):
 	# Adds 2 lists as:
-	# newList = list1[:m] + sum of (list1[m:], list2[:m]) elements + list2[m:]
+	# newList = list1[:-m] + sum of (list1[-m:], list2[:m]) elements + list2[m:]
 
-	# newList = list1[:m] + add_elements(list1[m:], list2[:m]) + list2[m:]
-	print(len(list1[:-m]), len(list1[-m:]),len(list2[:m]), len(list1[m:]))
+	# First convert the numpy arrays to lists, add them, return them
+	newList = list(list1[:-m]) + add_elements(list(list1[-m:]), list(list2[:m])) + list(list1[m:])
+	# print(len(list1[:-m]), len(list1[-m:]),len(list2[:m]), len(list1[m:]))
 
-	# return newList
+	newList = asarray(newList)
+
+	return newList
 
 
 def add_elements(list1, list2):
@@ -416,7 +422,7 @@ def add_elements(list1, list2):
 
 
 cascadedMultiRate(x, nyq_rate, N=11)
-print(">>>>", len(t))
+# print(">>>>", len(t))
 
 delay = 0.5 * (N-1) / sample_rate
 
