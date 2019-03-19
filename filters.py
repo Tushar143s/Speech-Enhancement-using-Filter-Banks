@@ -171,3 +171,4 @@ show()
 
 # Multirate
 
+from sp import multirate

@@ -6,11 +6,10 @@ from numpy import cos, sin, pi, absolute, arange, asarray, array, log10
 # from sp import multirate4
 from scipy.signal import kaiserord, lfilter, firwin, freqz, iirfilter, freqs, butter
 from pylab import figure, clf, plot, xlabel, ylabel, xlim, ylim, title, grid, axes, show, legend
-from itertools import zip_longest
 from random import randint as ri
 
 
-sample_rate = 44000
+sample_rate = 44000 # set sample rate between 9 kHz to 11 kHz (original: 44 kHz)
 nsamples = 4 * int(sample_rate)
 t = arange(nsamples) / int(sample_rate)
 original = cos(2*pi*0.5*t) + 0.2*sin(2*pi*2.5*t+0.1) + \
@@ -22,7 +21,6 @@ original = cos(2*pi*0.5*t) + 0.2*sin(2*pi*2.5*t+0.1) + \
 # corrupted_signal = [x + y for x, y in zip_longest(list(original), list(noise), fillvalue=0)]
 # print(">>>>>>>>>>>>>>", len(original), len(corrupted_signal))
 x = original[:len(t)]
-print(x)
 
 
 
@@ -100,7 +98,7 @@ def decimate(s, r, n=None, fir=False):
 
 
 
-def interp(s, r, l=4, alpha=0.5):
+def interp(s, r, l=11, alpha=0.5):
     """Interpolation - increase sampling rate by integer factor r. Interpolation 
     increases the original sampling rate for a sequence to a higher rate. interp
     performs lowpass interpolation by inserting zeros into the original sequence
@@ -196,10 +194,10 @@ def upfirdn(s, h, p, q):
 ### Low Pass Filter Block
 
 
-def lowPassFilter(input_signal, order, nyq_rate):
+def lowPassFilter(input_signal, nyq_rate, order=11, cutoff_hz=20000.0):
 	# Create a low pass filter with cut off frequency 20k Hz -> pass all freq below 20k Hz
 	# The cutoff frequency of the filter.
-	cutoff_hz = 20000.0
+	# cutoff_hz = 20000.0
 
 	# Use firwin with a Kaiser window to create a lowpass FIR filter.
 	taps = firwin(order, cutoff_hz/nyq_rate, window=('kaiser', beta))
@@ -213,10 +211,10 @@ def lowPassFilter(input_signal, order, nyq_rate):
 
 ### High Pass Filter Block
 
-def highPassFilter(input_signal, order, nyq_rate):
+def highPassFilter(input_signal, nyq_rate, order=11, cutoff_hz=20.0):
 	# Create a High pass filter, with cut off freq 20 Hz -> pass all freq above 20k Hz
 	# The cutoff frequency of the filter.
-	cutoff_hz = 20.0
+	# cutoff_hz = 20.0
 
 	# Use firwin with a Kaiser window to create a lowpass FIR filter.
 	taps = firwin(order, cutoff_hz/nyq_rate, window=('kaiser', beta), pass_zero=False)
@@ -227,36 +225,208 @@ def highPassFilter(input_signal, order, nyq_rate):
 	return filtered_x
 
 ### /High Pass Filter Block
+
 # ------------------------------------------------------
 
-# 1. Pass Signal via the low pass filter and get output
+def cascadedMultiRate(x, nyq_rate, N=11):
+	# Cascaded signal
 
-filtered_signal = lowPassFilter(x, N, nyq_rate)
+	# Params: x=signal, N=order, nyq_rate = nyquist rate
 
-print(filtered_signal)
+	# Break into cascades into 6 stages, of ranges -> low, high
 
-# 2. Down Sample the flitered signal
+	# Imp: Set rate of downsampling and upsampling to 11
+	downsample_rate = 11
+	upsample_rate = 11
+	filter_length = 9 
 
-# 3. Upsample the filtered signal
+	### Stage 1: low = 20.0 Hz, high = 100 Hz
 
-# 4. Pass signal via high pass filter and get output
+	# 1. Pass Signal via the low pass filter and get output
 
-filtered_signal = lowPassFilter(x, N, nyq_rate)
-print(filtered_signal)
+	filtered_signal_lowpass1 = lowPassFilter(x, nyq_rate, order=N, cutoff_hz=100.0) # x: signal, N=order, cutoff_hz=cutoff of LPF(pass signals lower this)
 
-# 5. Add the signals to get output signals
+
+	# 2. Down Sample the flitered signal
+
+	deciminated_signal1 = decimate(filtered_signal_lowpass1, downsample_rate, fir=False) 
+
+
+	# 3. Upsample/intropolate the filtered signal
+
+	intropolated_signal1 = interp(deciminated_signal1, upsample_rate, l=filter_length, alpha=0.5) 
+
+	# 4. Pass signal via high pass filter and get output
+
+	filtered_signal_highpass1 = highPassFilter(intropolated_signal1, nyq_rate, order=N, cutoff_hz=20.0)
+	filtered_signal_highpass1 = resample(filtered_signal_highpass1, upsample_rate, downsample_rate)
+
+	### /Stage 1: low = 20.0 Hz, high = 100 Hz
+
+	### Stage 2: low = 95.0 Hz, high = 1 kHz
+
+	# 1. Pass Signal via the low pass filter and get output
+
+	filtered_signal_lowpass2 = lowPassFilter(x, nyq_rate, order=N, cutoff_hz=1000.0)
+
+
+	# 2. Down Sample the flitered signal
+
+	deciminated_signal2 = decimate(filtered_signal_lowpass2, downsample_rate, fir=False)
+
+
+	# 3. Upsample/intropolate the filtered signal
+
+	intropolated_signal2 = interp(deciminated_signal2, upsample_rate, l=filter_length, alpha=0.5) 
+
+	# 4. Pass signal via high pass filter and get output
+
+	filtered_signal_highpass2 = highPassFilter(intropolated_signal2, nyq_rate, order=N, cutoff_hz=95.0)
+	filtered_signal_highpass2 = resample(filtered_signal_highpass2, upsample_rate, downsample_rate)
+
+	### /Stage 2: low = 95.0 Hz, high = 1 kHz
+
+	### Stage 3: low = 0.9 kHz, high = 5 kHz
+
+	# 1. Pass Signal via the low pass filter and get output
+
+	filtered_signal_lowpass3 = lowPassFilter(x, nyq_rate, order=N, cutoff_hz=900.0)
+
+	# 2. Down Sample the flitered signal
+
+	deciminated_signal3 = decimate(filtered_signal_lowpass3, downsample_rate, fir=False)
+
+
+	# 3. Upsample/intropolate the filtered signal
+
+	intropolated_signal3 = interp(deciminated_signal3, upsample_rate, l=filter_length, alpha=0.5)
+
+	# 4. Pass signal via high pass filter and get output
+
+	filtered_signal_highpass3 = highPassFilter(intropolated_signal3, nyq_rate, order=N, cutoff_hz=5000.0)
+	filtered_signal_highpass3 = resample(filtered_signal_highpass3, upsample_rate, downsample_rate)
+
+	### /Stage 3: low = 0.9 kHz, high = 5 kHz
+
+	### Stage 4: low = 4.9 kHz, high = 10 kHz
+
+	# 1. Pass Signal via the low pass filter and get output
+
+	filtered_signal_lowpass4 = lowPassFilter(x, nyq_rate, order=N, cutoff_hz=4900.0)
+
+
+	# 2. Down Sample the flitered signal
+
+	deciminated_signal4 = decimate(filtered_signal_lowpass4, downsample_rate, fir=False)
+
+
+	# 3. Upsample/intropolate the filtered signal
+
+	intropolated_signal4 = interp(deciminated_signal4, upsample_rate, l=filter_length, alpha=0.5)
+
+	# 4. Pass signal via high pass filter and get output
+
+	filtered_signal_highpass4 = highPassFilter(intropolated_signal4, nyq_rate, order=N, cutoff_hz=10000.0)
+	filtered_signal_highpass4 = resample(filtered_signal_highpass4, upsample_rate, downsample_rate)
+
+	### /Stage 4: low = 4.9 kHz, high = 10 kHz
+
+	### Stage 5: low = 9.9 kHz, high = 15 kHz
+
+	# 1. Pass Signal via the low pass filter and get output
+
+	filtered_signal_lowpass5 = lowPassFilter(x, nyq_rate, order=N, cutoff_hz=9900.0)
+
+
+	# 2. Down Sample the flitered signal
+
+	deciminated_signal5 = decimate(filtered_signal_lowpass5, downsample_rate, fir=False)
+
+
+	# 3. Upsample/intropolate the filtered signal
+
+	intropolated_signal5 = interp(deciminated_signal5, upsample_rate, l=filter_length, alpha=0.5)
+
+	# 4. Pass signal via high pass filter and get output
+
+	filtered_signal_highpass5 = highPassFilter(intropolated_signal5, nyq_rate, order=N, cutoff_hz=15000.0)
+	filtered_signal_highpass5 = resample(filtered_signal_highpass5, upsample_rate, downsample_rate)
+
+	### /Stage 5: low = 9.9 kHz, 15 kHz
+
+	### Stage 6: low = 14.9 kHz, 20 kHz
+
+	# 1. Pass Signal via the low pass filter and get output
+
+	filtered_signal_lowpass6 = lowPassFilter(x, nyq_rate, order=N, cutoff_hz=14900.0)
+
+
+	# 2. Down Sample the flitered signal
+
+	deciminated_signal6 = decimate(filtered_signal_lowpass6, downsample_rate, fir=False)
+
+
+	# 3. Upsample/intropolate the filtered signal
+
+	intropolated_signal6 = interp(deciminated_signal6, upsample_rate, l=filter_length, alpha=0.5)
+
+	# 4. Pass signal via high pass filter and get output
+
+	filtered_signal_highpass6 = highPassFilter(intropolated_signal6, nyq_rate, order=N, cutoff_hz=20000.0)
+	filtered_signal_highpass6 = resample(filtered_signal_highpass6, upsample_rate, downsample_rate)
+
+	### /Stage 6: low = 14.9 kHz, high = 20 kHz
+
+	print(len(filtered_signal_highpass1))
+	# figure(1)
+	# plot(filtered_signal_highpass1, 'r-', label='shifted signal')
+
+	print(">>>>>>>", addCascadedOutputs(filtered_signal_highpass1, filtered_signal_highpass2, 5))
+	print(len(filtered_signal_highpass2))
+	print(len(filtered_signal_highpass3))
+	print(len(filtered_signal_highpass4))
+	print(len(filtered_signal_highpass5))
+	print(len(filtered_signal_highpass6))
+
+
+	# 5. Add the signals to get output signals
+
+
+	# Todo
+
+	#----------------------------------------------------------------------------
+
+	pass
+
+
+def addCascadedOutputs(list1, list2, m, n=0):
+	# Adds 2 lists as:
+	# newList = list1[:m] + sum of (list1[m:], list2[:m]) elements + list2[m:]
+
+	newList = list1[:m] + add_elements(list1[m:], list2[:m]) + list2[m:]
+
+	return newList
+
+
+def add_elements(list1, list2):
+	# adds elements of list1 and 2 parallely
+
+	return [a + b for a, b in zip(list1, list2)]
+
+
+cascadedMultiRate(x, nyq_rate, N=11)
+print(">>>>", len(t))
 
 delay = 0.5 * (N-1) / sample_rate
 
-figure(1)
+# figure(1)
 # Plot the original signal.
-plot(t, original, label='original signal')
 # Plot the filtered signal, shifted to compensate for the phase delay.
 # plot(t-delay, filtered_x, 'r-', label='shifted signal')
 # Plot just the "good" part of the filtered signal.  The first N-1
 # samples are "corrupted" by the initial conditions.
 # plot(t[N-1:]-delay, filtered_signal[N-1:], 'g', linewidth=4, label='filtered signal')
-legend()
-xlabel('t')
-grid(True)
-show()
+# legend()
+# xlabel('t')
+# grid(True)
+# show()
