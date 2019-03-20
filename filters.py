@@ -19,9 +19,10 @@ __status__ = "Production"
 
 from numpy import cos, sin, pi, absolute, arange, asarray, array, log10
 from scipy.signal import kaiserord, lfilter, firwin, freqz, iirfilter, freqs, butter
-from pylab import figure, clf, plot, xlabel, ylabel, xlim, ylim, title, grid, axes, show, legend
+from pylab import figure, clf, plot, xlabel, ylabel, xlim, ylim, title, grid, axes, show, legend, suptitle
 from scipy.io import wavfile
 import matplotlib.pyplot as plt
+from numpy.random import randn
 
 #------------------------------------------------------------------------------------------
 
@@ -37,6 +38,9 @@ t = arange(nsamples) / int(sample_rate)
 x = cos(2*pi*0.5*t) + 0.2*sin(2*pi*2.5*t+0.1) + \
         0.2*sin(2*pi*15.3*t) + 0.1*sin(2*pi*16.7*t + 0.1) + \
             0.1*sin(2*pi*23.45*t+.8)
+
+original_signal = x[:len(t)]
+x = x + randn(len(t)) * 0.08
 x = x[:len(t)]
 # print(len(t), len(x))
 # print(sample_rate)
@@ -72,52 +76,6 @@ taps = firwin(N, [low/nyq_rate, high/nyq_rate] , window=('kaiser', beta))
 # Use lfilter to filter x with the FIR filter.
 filtered_x = lfilter(taps, 1.0, x)
 
-# #------------------------------------------------
-# # Plot the FIR filter coefficients.
-# #------------------------------------------------
-
-# figure(1)
-# plot(taps, 'bo-', linewidth=2)
-# title('Filter Coefficients (%d taps)' % N)
-# grid(True)
-
-# #------------------------------------------------
-# # Plot the magnitude response of the filter.
-# #------------------------------------------------
-
-# figure(2)
-# clf()
-# w, h = freqz(taps, worN=8000)
-# plot((w/pi)*nyq_rate, absolute(h), linewidth=2)
-# xlabel('Frequency (Hz)')
-# ylabel('Gain')
-# title('Frequency Response')
-# ylim(-0.05, 1.05)
-# grid(True)
-
-# # Upper inset plot.
-# ax1 = axes([0.42, 0.6, .45, .25])
-# plot((w/pi)*nyq_rate, absolute(h), linewidth=2)
-# xlim(0,8.0)
-# ylim(0.9985, 1.001)
-# grid(True)
-
-# # Lower inset plot
-# ax2 = axes([0.42, 0.25, .45, .25])
-# plot((w/pi)*nyq_rate, absolute(h), linewidth=2)
-# xlim(12.0, 20.0)
-# ylim(0.0, 0.0025)
-# grid(True)
-
-#------------------------------------------------
-# Plot the original and filtered signals.
-#------------------------------------------------
-
-# The phase delay of the filtered signal.
-
-
-
-# show()
 
 #-------------------------------------------------------------------------
 
@@ -593,55 +551,84 @@ figure(1)
 delay = 0.5 * (N-1) / sample_rate
 
 # Plot the original signal.
-plot(t, x, label='original signal')
+plot(t, original_signal, 'm', label='original signal')
+# Plot Noisy signal
+plot(t, x, label='noisy signal')
 # Plot just the "good" part of the filtered signal.  The first N-1
 # samples are "corrupted" by the initial conditions.
-plot(t[N-1:]-delay, filtered_x[N-1:], 'green', linewidth=4, label='filtered signal of fir')
-plot(t, iir_output, 'yellow', linewidth=4, label='filtered signal of iir')
+plot(t[N-1:]-delay, filtered_x[N-1:], 'green', label='filtered signal of fir')
+plot(t, iir_output, 'yellow', label='filtered signal of iir')
 legend()
-xlabel('t')
+xlabel('time')
+ylabel('amplitude')
 grid(True)
+suptitle("Fir, IIR output and Original Signal")
 
 # 2. Fir vs Original Signal 
 
 figure(2)
 # Plot the original signal.
-plot(t, x, label='original signal')
+plot(t, original_signal, 'm', label='original signal')
+# Plot Noisy signal
+plot(t, x, label='noisy signal')
 # Plot the filtered signal, shifted to compensate for the phase delay.
 plot(t-delay, filtered_x, 'r-', label='shifted signal')
 # Plot just the "good" part of the filtered signal.  The first N-1
 # samples are "corrupted" by the initial conditions.
-plot(t[N-1:]-delay, filtered_x[N-1:], 'g', linewidth=4, label='filtered signal')
+plot(t[N-1:]-delay, filtered_x[N-1:], 'g', label='filtered signal')
 legend()
-xlabel('t')
+xlabel('time')
+ylabel('amplitude')
 grid(True)
+suptitle("Fir output and Original Signal")
 
 # 3. Fir vs Multirate vs Original Signal
 
 figure(3)
 # Plot the original signal.
-plot(t, x, label='original signal')
+plot(t, original_signal, 'm', label='original signal')
+# Plot Noisy signal
+plot(t, x, label='noisy signal')
 # Plot Multirate output
 plot(t, multirate_output[:len(t)], 'black', label='multirate output signal')
 # Plot Fir Output
 # Plot just the "good" part of the filtered signal.  The first N-1
 # samples are "corrupted" by the initial conditions.
-plot(t[N-1:]-delay, filtered_x[N-1:], 'g', linewidth=4, label='filtered signal')
+plot(t[N-1:]-delay, filtered_x[N-1:], 'g', label='filtered signal')
 legend()
-xlabel('t')
+xlabel('time')
+ylabel('amplitude')
 grid(True)
+suptitle("Fir, Multirate output and Original Signal")
 
 
 # 4. Multirate vs Original Signal
 
 figure(4)
 # Plot the original signal.
-plot(t, x, label='original signal')
+plot(t, original_signal, 'm', label='original signal')
+# Plot Noisy signal
+plot(t, x, label='noisy signal')
 # Plot Multirate output
 plot(t, multirate_output[:len(t)], 'black', label='multirate output signal')
-
 legend()
-xlabel('t')
+xlabel('time')
+ylabel('amplitude')
 grid(True)
+suptitle("Multirate output, Noisy and Original Signal")
+
+# 5. original Signal vs Multirate output 
+
+figure(5)
+# Plot the original signal.
+plot(t, original_signal, 'm', label='original signal')
+
+# Plot Multirate output
+plot(t, multirate_output[:len(t)], 'black', label='multirate output signal')
+legend()
+xlabel('time')
+ylabel('amplitude')
+grid(True)
+suptitle("Multirate output and Original Signal")
 
 show()
