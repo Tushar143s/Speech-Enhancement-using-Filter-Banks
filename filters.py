@@ -18,7 +18,7 @@ __status__ = "Production"
 ##############################################################################
 
 from numpy import cos, sin, pi, absolute, arange, asarray, array, log10
-from scipy.signal import kaiserord, lfilter, firwin, freqz, iirfilter, freqs, butter
+from scipy.signal import kaiserord, lfilter, firwin, freqz, iirfilter, freqs, butter, lfilter
 from pylab import figure, clf, plot, xlabel, ylabel, xlim, ylim, title, grid, axes, show, legend, suptitle
 from scipy.io import wavfile
 import matplotlib.pyplot as plt
@@ -31,16 +31,22 @@ from numpy.random import randn
 # Create a signal for demonstration.
 # sample_rate = 44000
 # nsamples = 44000 * 4
-# sample_rate, x = wavfile.read('./audio.wav')
-sample_rate = 44000
+sample_rate, x = wavfile.read('./out.wav')
+# sample_rate = 44000
 nsamples = 4 * int(sample_rate)
 t = arange(nsamples) / int(sample_rate)
-x = cos(2*pi*0.5*t) + 0.2*sin(2*pi*2.5*t+0.1) + \
-        0.2*sin(2*pi*15.3*t) + 0.1*sin(2*pi*16.7*t + 0.1) + \
-            0.1*sin(2*pi*23.45*t+.8)
+# x = cos(2*pi*0.5*t) + 0.2*sin(2*pi*2.5*t+0.1) + \
+#         0.2*sin(2*pi*15.3*t) + 0.1*sin(2*pi*16.7*t + 0.1) + \
+#             0.1*sin(2*pi*23.45*t+.8)
+print("<<<", len(x))
+print(">>",len(t))
+
+# if len(x) != len(t):
+	# append zeroes to x
+
 
 original_signal = x[:len(t)]
-x = x + randn(len(t)) * 0.08
+x = x[:len(t)] + randn(len(t)) * 0.08
 x = x[:len(t)]
 # print(len(t), len(x))
 # print(sample_rate)
@@ -211,7 +217,7 @@ def decimate(s, r, n=None, fir=False):
         if n is None:
             n = 8
         b, a = signal.cheby1(n, 0.05, 0.8/r)
-        f = signal.filtfilt(b, a, s)
+        f = signal.lfilter(b, a, s)
     return downsample(f, r)
 
 
