@@ -23,9 +23,14 @@ from pylab import figure, clf, plot, xlabel, ylabel, xlim, ylim, title, grid, ax
 from scipy.io import wavfile
 import matplotlib.pyplot as plt
 from numpy.random import randn
+import sys, fractions
+import numpy
+from scipy import signal
+from numpy import cos, sin, pi, absolute, arange, asarray, array, log10, int16
+from random import randint as ri
 
 #------------------------------------------------------------------------------------------
-input_file = input("Enter the name of the file: ")
+input_file = input("Enter the name of the file: ").strip()
 if input_file == "":
 	input_file = "./wav/yahama.wav"
 else:
@@ -39,32 +44,30 @@ else:
 # sample_rate = 44000
 # nsamples = 44000 * 4
 sample_rate, x = wavfile.read(input_file)
-print(sample_rate)
+# print(sample_rate)
 # sample_rate = 44000
 nsamples = 4 * int(sample_rate)
 t = arange(nsamples) / int(sample_rate)
 # x = cos(2*pi*0.5*t) + 0.2*sin(2*pi*2.5*t+0.1) + \
 #         0.2*sin(2*pi*15.3*t) + 0.1*sin(2*pi*16.7*t + 0.1) + \
 #             0.1*sin(2*pi*23.45*t+.8)
-print("<<<", len(x))
-print(">>",len(t))
+# print("<<<", len(x))
+# print(">>",len(t))
 
 if len(x) != len(t) and len(x) < len(t):
 	# then pad x
-	print("here")
+	# print("here")
 	pad(x, (0, len(t) - len(x)), 'constant')
 	t = t[:len(x)]
 elif len(t) != len(x) and len(x) > len(t):
 	# then trim x
 	x = x[:len(t)]
 
-original_signal = x#[:len(t)]
-# x = x[:len(t)] + randn(len(t)) * 0.8
-# x = x[:len(t)]
-print(">>>>", len(x), "<<<", len(t))
-print(array_equal(original_signal, x))
-# print(len(t), len(x))
-# print(sample_rate)
+original_signal = x[:len(t)]
+x = x[:len(t)] + randn(len(t)) * ri(1,10)
+x = x[:len(t)]
+# print(">>>>", len(x), "<<<", len(t))
+# print(array_equal(original_signal, x))
 
 
 
@@ -120,79 +123,8 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order=1):
 
 iir_output = butter_bandpass_filter(x, low, high, sample_rate)
 
-# figure(2)
-# # Plot the original signal.
-# plot(t, x, label='original signal')
-# # Plot just the "good" part of the filtered signal.  The first N-1
-# # samples are "corrupted" by the initial conditions.
-# plot(t[N-1:]-delay, filtered_x[N-1:], 'green', linewidth=4, label='filtered signal of fir')
-# plot(t, iir_output, 'yellow', linewidth=4, label='filtered signal of iir')
-# legend()
-# xlabel('t')
-# grid(True)
-
-# show()
-
-#############################################################################################
-
-# Multirate
-
-import sys
-import fractions
-import numpy
-from scipy import signal
-from numpy import cos, sin, pi, absolute, arange, asarray, array, log10, int16
-# from sp import multirate4
-from scipy.signal import kaiserord, lfilter, firwin, freqz, iirfilter, freqs, butter
-from pylab import figure, clf, plot, xlabel, ylabel, xlim, ylim, title, grid, axes, show, legend
-from random import randint as ri
-
-
-# # sample_rate = 44000 # set sample rate between 9 kHz to 11 kHz (original: 44 kHz)
-# # nsamples = 4 * int(sample_rate)
-# # t = arange(nsamples) / int(sample_rate)
-# # original = cos(2*pi*0.5*t) + 0.2*sin(2*pi*2.5*t+0.1) + \
-# #         0.2*sin(2*pi*15.3*t) + 0.1*sin(2*pi*16.7*t + 0.1) + \
-# #             0.1*sin(2*pi*23.45*t+.8)
-
-
-# # noise = numpy.random.uniform(low=0, high=10, size=(int(len(t)/ri(1, 3000)),))
-# # corrupted_signal = [x + y for x, y in zip_longest(list(original), list(noise), fillvalue=0)]
-# # print(">>>>>>>>>>>>>>", len(original), len(corrupted_signal))
-# # x = original[:len(t)]
-
-
-
-# # The Nyquist rate of the signal.
-# nyq_rate = sample_rate / 2.0
-
-# # The desired width of the transition from pass to stop,
-# # relative to the Nyquist rate.  We'll design the filter
-# # with a 5 Hz transition width.
-# width = 5.0/nyq_rate
-
-# # The desired attenuation in the stop band, in dB.
-# ripple_db = 60.0
-
-# #------------------------------------------------------------------------------------------
-
-# # Create FIR Filter and apply to x
-
-# # Compute the order and Kaiser parameter for the FIR filter.
-# N, beta = kaiserord(ripple_db, width)
-
-# # The cutoff frequency of the filter.
-# # cutoff_hz = 10.0
-# low = 20.0
-# high = 20000.0
-
-
-#------------------------------------------------------------------------------------------
-
+#####################################################
 # Multirate block
-
-# -----------------------------------------------------
-
 #####################################################
 
 def downsample(s, n, phase=0):
@@ -532,7 +464,7 @@ def cascadedMultiRate(x, nyq_rate, N=11):
 	#----------------------------------------------------------------------------
 
 	# return final output
-	print(len(cascaded123456))
+	# print(len(cascaded123456))
 	
 	return cascaded123456
 
@@ -569,105 +501,114 @@ multirate_output = cascadedMultiRate(x, nyq_rate, N=11)
 
 
 ###########################################################################################################
-# Plotting Graph Area
-"""
 
-# 1. Fir vs IIR vs Original Signal output
+# write to wavfile
+data2 = asarray(multirate_output[:len(x)], dtype=int16)
+wavfile.write("./multirate_output.wav", 44100, data2)
+data2 = asarray(x, dtype=int16)
+wavfile.write("./noisy_signal_output.wav", 44100, data2)
+data2 = asarray(filtered_x, dtype=int16)
+wavfile.write("./fir_output.wav", 44100, data2)
+data2 = asarray(iir_output, dtype=int16)
+wavfile.write("./iir_output.wav", 44100, data2)
+
+# Graph Block
+
+# 1. Original vs Noisy
 
 figure(1)
 
+
+# Plot the original signal.
+plot(t, original_signal, 'b', label='original signal')
+# Plot Noisy signal
+plot(t, x, 'c', label='noisy signal')
+legend()
+xlabel('time')
+ylabel('amplitude')
+grid(True)
+suptitle("Original Signal vs Noisy Signal")
+
+# 2. FIR vs IIR
+
+figure(2)
+# delay for FIRs
 delay = 0.5 * (N-1) / sample_rate
 
 # Plot the original signal.
-plot(t, original_signal, 'm', label='original signal')
-# Plot Noisy signal
-plot(t, x, label='noisy signal')
+plot(t, original_signal, 'b', label='original signal')
+# # Plot Noisy signal
+# plot(t, x, label='noisy signal')
+# # Plot the filtered signal, shifted to compensate for the phase delay.
+# plot(t-delay, filtered_x, 'r-', label='shifted signal')
 # Plot just the "good" part of the filtered signal.  The first N-1
 # samples are "corrupted" by the initial conditions.
-plot(t[N-1:]-delay, filtered_x[N-1:], 'green', label='filtered signal of fir')
-plot(t, iir_output, 'yellow', label='filtered signal of iir')
+plot(t[N-1:]-delay, filtered_x[N-1:], 'r', label='Filtered Signal of Bandpass FIR filter')
+plot(t, iir_output, 'y', label='Filtered Signal of Bandpass IIR filter')
 legend()
 xlabel('time')
 ylabel('amplitude')
 grid(True)
-suptitle("Fir, IIR output and Original Signal")
+suptitle("Original Signal, FIR filter and IIR filter outputs")
 
-# 2. Fir vs Original Signal 
-
-figure(2)
-# Plot the original signal.
-plot(t, original_signal, 'm', label='original signal')
-# Plot Noisy signal
-plot(t, x, label='noisy signal')
-# Plot the filtered signal, shifted to compensate for the phase delay.
-plot(t-delay, filtered_x, 'r-', label='shifted signal')
-# Plot just the "good" part of the filtered signal.  The first N-1
-# samples are "corrupted" by the initial conditions.
-plot(t[N-1:]-delay, filtered_x[N-1:], 'g', label='filtered signal')
-legend()
-xlabel('time')
-ylabel('amplitude')
-grid(True)
-suptitle("Fir output and Original Signal")
-
-# 3. Fir vs Multirate vs Original Signal
-
+# 3. Original vs IIR
 figure(3)
 # Plot the original signal.
-plot(t, original_signal, 'm', label='original signal')
-# Plot Noisy signal
-plot(t, x, label='noisy signal')
+plot(t, original_signal, 'b', label='original signal')
+# # Plot Noisy signal
+# plot(t, x, label='noisy signal')
 # Plot Multirate output
-plot(t, multirate_output[:len(t)], 'black', label='multirate output signal')
+plot(t, iir_output, 'y', label='Filtered Signal of Bandpass IIR filter')
 # Plot Fir Output
-# Plot just the "good" part of the filtered signal.  The first N-1
-# samples are "corrupted" by the initial conditions.
-plot(t[N-1:]-delay, filtered_x[N-1:], 'g', label='filtered signal')
 legend()
 xlabel('time')
 ylabel('amplitude')
 grid(True)
-suptitle("Fir, Multirate output and Original Signal")
+suptitle("Original Signal and IIR filter output")
 
 
-# 4. Multirate vs Original Signal
-
+# 4. Original vs IIR vs Multirate
 figure(4)
 # Plot the original signal.
-plot(t, original_signal, 'm', label='original signal')
-# Plot Noisy signal
-plot(t, x, label='noisy signal')
+plot(t, original_signal, 'b', label='original signal')
+
 # Plot Multirate output
-plot(t, multirate_output[:len(t)], 'black', label='multirate output signal')
+plot(t, multirate_output[:len(t)], 'g', label='Filtered Signal of Cascaded Multirate filter')
+plot(t, iir_output, 'y', label='Filtered Signal of Bandpass IIR filter')
 legend()
 xlabel('time')
 ylabel('amplitude')
 grid(True)
-suptitle("Multirate output, Noisy and Original Signal")
+suptitle("Original Signal, IIR filter and Multirate filter outputs")
 
-# 5. original Signal vs Multirate output 
+# 5. Noisy vs Multirate
 
 figure(5)
-# Plot the original signal.
-plot(t, original_signal, 'm', label='original signal')
-
+# Plot Noisy signal
+plot(t, x, 'c', label='noisy signal')
 # Plot Multirate output
-plot(t, multirate_output[:len(t)], 'black', label='multirate output signal')
+plot(t, multirate_output[:len(t)], 'g', label='Filtered Signal of Cascaded Multirate filter')
 legend()
 xlabel('time')
 ylabel('amplitude')
 grid(True)
-suptitle("Multirate output and Original Signal")
-"""
-# write to wavfile
-data2 = asarray(multirate_output[:len(x)], dtype=int16)
-wavfile.write("./multi_out", 44100, data2)
-data2 = asarray(x, dtype=int16)
-wavfile.write("./noisy_out", 44100, data2)
-data2 = asarray(filtered_x, dtype=int16)
-wavfile.write("./fir_out", 44100, data2)
-data2 = asarray(iir_output, dtype=int16)
-wavfile.write("./iir_out", 44100, data2)
+suptitle("Noisy Signal and Multirate filter output")
+
+# 6. Original vs Multirate
+
+figure(6)
+# Plot the original signal.
+plot(t, original_signal, 'b', label='original signal')
+
+# Plot Multirate output
+plot(t, multirate_output[:len(t)], 'g', label='Filtered Signal of Cascaded Multirate filter')
+legend()
+xlabel('time')
+ylabel('amplitude')
+grid(True)
+suptitle("Original Signal and Multirate filter output")
 
 
-# show()
+show()
+
+# End of code
