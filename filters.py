@@ -17,12 +17,19 @@ __status__ = "Production"
 
 ##############################################################################
 
-from numpy import cos, sin, pi, absolute, arange, asarray, array, log10
+from numpy import cos, sin, pi, absolute, arange, asarray, array, log10, array_equal
 from scipy.signal import kaiserord, lfilter, firwin, freqz, iirfilter, freqs, butter, lfilter
 from pylab import figure, clf, plot, xlabel, ylabel, xlim, ylim, title, grid, axes, show, legend, suptitle
 from scipy.io import wavfile
 import matplotlib.pyplot as plt
 from numpy.random import randn
+
+#------------------------------------------------------------------------------------------
+input_file = input("Enter the name of the file: ")
+if input_file == "":
+	input_file = "./wav/yahama.wav"
+else:
+	input_file = "./wav/" + input_file + ".wav"
 
 #------------------------------------------------------------------------------------------
 
@@ -31,7 +38,7 @@ from numpy.random import randn
 # Create a signal for demonstration.
 # sample_rate = 44000
 # nsamples = 44000 * 4
-sample_rate, x = wavfile.read('./out.wav')
+sample_rate, x = wavfile.read(input_file)
 print(sample_rate)
 # sample_rate = 44000
 nsamples = 4 * int(sample_rate)
@@ -42,13 +49,19 @@ t = arange(nsamples) / int(sample_rate)
 print("<<<", len(x))
 print(">>",len(t))
 
-# if len(x) != len(t):
-	# append zeroes to x
-
+if len(x) != len(t) and len(x) < len(t):
+	# then trim t
+	print("here")
+	t = t[:len(x)]
+elif len(t) != len(x) and len(x) > len(t):
+	# then trim x
+	x = x[:len(t)]
 
 original_signal = x[:len(t)]
-x = x[:len(t)] + randn(len(t)) * 0.08
+x = x[:len(t)] + randn(len(t)) * 0.8
 x = x[:len(t)]
+
+print(array_equal(original_signal, x))
 # print(len(t), len(x))
 # print(sample_rate)
 
@@ -127,7 +140,7 @@ import sys
 import fractions
 import numpy
 from scipy import signal
-from numpy import cos, sin, pi, absolute, arange, asarray, array, log10
+from numpy import cos, sin, pi, absolute, arange, asarray, array, log10, int16
 # from sp import multirate4
 from scipy.signal import kaiserord, lfilter, firwin, freqz, iirfilter, freqs, butter
 from pylab import figure, clf, plot, xlabel, ylabel, xlim, ylim, title, grid, axes, show, legend
@@ -638,4 +651,15 @@ ylabel('amplitude')
 grid(True)
 suptitle("Multirate output and Original Signal")
 
-show()
+# write to wavfile
+data2 = asarray(multirate_output, dtype=int16)
+wavfile.write("./multi_out", 44100, data2)
+data2 = asarray(x, dtype=int16)
+wavfile.write("./noisy_out", 44100, data2)
+data2 = asarray(filtered_x, dtype=int16)
+wavfile.write("./fir_out", 44100, data2)
+data2 = asarray(iir_output, dtype=int16)
+wavfile.write("./iir_out", 44100, data2)
+
+
+# show()
