@@ -32,6 +32,7 @@ from numpy.random import randn
 # sample_rate = 44000
 # nsamples = 44000 * 4
 sample_rate, x = wavfile.read('./out.wav')
+print(sample_rate)
 # sample_rate = 44000
 nsamples = 4 * int(sample_rate)
 t = arange(nsamples) / int(sample_rate)
@@ -77,7 +78,7 @@ low = 20.0
 high = 20000.0
 
 # Use firwin with a Kaiser window to create a bandpass FIR filter.
-taps = firwin(N, [low/nyq_rate, high/nyq_rate] , window=('kaiser', beta))
+taps = firwin(N, [low/nyq_rate, high/nyq_rate], window=('kaiser', beta))
 
 # Use lfilter to filter x with the FIR filter.
 filtered_x = lfilter(taps, 1.0, x)
