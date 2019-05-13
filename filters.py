@@ -5,19 +5,19 @@ This script contains functions relating to Finite Impulse Response Filter
 """
 
 # Script details
-__author__ = "Sudarshan Parvatikar"
+__author__ = ["Lukman Shaikh", "Kirti K", "Tushar Khot","Sudarshan Parvatikar"]
 __copyright__ = "Copyright 2018-2019, Kyonen-no-Project"
-__credits__ = ["Sudarshan Parvatikar"]
+__credits__ = ["Lukman Shaikh", "Kirti K", "Tushar Khot","Sudarshan Parvatikar"]
 __license__ = "MIT"
 __version__ = "0.0.1"
-__maintainer__ = "Sudarshan Parvatikar"
-__email__ = "sudarshan.parvatikar@null.net"
+__maintainer__ = ["Lukman Shaikh", "Kirti K", "Tushar Khot","Sudarshan Parvatikar"]
+__email__ = None
 __status__ = "Production"
 
 
 ##############################################################################
 
-from numpy import cos, sin, pi, absolute, arange, asarray, array, log10, array_equal
+from numpy import cos, sin, pi, absolute, pad, arange, asarray, array, log10, array_equal
 from scipy.signal import kaiserord, lfilter, firwin, freqz, iirfilter, freqs, butter, lfilter
 from pylab import figure, clf, plot, xlabel, ylabel, xlim, ylim, title, grid, axes, show, legend, suptitle
 from scipy.io import wavfile
@@ -50,17 +50,18 @@ print("<<<", len(x))
 print(">>",len(t))
 
 if len(x) != len(t) and len(x) < len(t):
-	# then trim t
+	# then pad x
 	print("here")
+	pad(x, (0, len(t) - len(x)), 'constant')
 	t = t[:len(x)]
 elif len(t) != len(x) and len(x) > len(t):
 	# then trim x
 	x = x[:len(t)]
 
-original_signal = x[:len(t)]
-x = x[:len(t)] + randn(len(t)) * 0.8
-x = x[:len(t)]
-
+original_signal = x#[:len(t)]
+# x = x[:len(t)] + randn(len(t)) * 0.8
+# x = x[:len(t)]
+print(">>>>", len(x), "<<<", len(t))
 print(array_equal(original_signal, x))
 # print(len(t), len(x))
 # print(sample_rate)
@@ -547,6 +548,13 @@ def addCascadedOutputs(list1, list2, m, n=0):
 	# print(len(list1[:-m]), len(list1[-m:]),len(list2[:m]), len(list1[m:]))
 
 	newList = asarray(newList)
+	# if len(list1) > len(list2):
+	# 	# pad list2 and add
+	# 	pad(list2, (0, len(list1) - len(list2)), 'constant')
+	# elif len(list2) > len(list1):
+	# 	# pad list1 and add
+	# 	pad(list1, (0, len(list2) - len(list1)), 'constant')
+	# newList = list1 + list2
 
 	return newList
 
@@ -562,7 +570,7 @@ multirate_output = cascadedMultiRate(x, nyq_rate, N=11)
 
 ###########################################################################################################
 # Plotting Graph Area
-
+"""
 
 # 1. Fir vs IIR vs Original Signal output
 
@@ -650,9 +658,9 @@ xlabel('time')
 ylabel('amplitude')
 grid(True)
 suptitle("Multirate output and Original Signal")
-
+"""
 # write to wavfile
-data2 = asarray(multirate_output, dtype=int16)
+data2 = asarray(multirate_output[:len(x)], dtype=int16)
 wavfile.write("./multi_out", 44100, data2)
 data2 = asarray(x, dtype=int16)
 wavfile.write("./noisy_out", 44100, data2)
