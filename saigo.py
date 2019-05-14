@@ -5,12 +5,12 @@ This script contains functions relating to Finite Impulse Response Filter
 """
 
 # Script details
-__author__ = ["Lukman Shaikh", "Keerti Karlingannavar", "Tushar Khot","Sudarshan Parvatikar"]
+__author__ = ["Lukman Shaikh", "Keerti Karlingannavar", "Tushar Khot", "Sudarshan Parvatikar"]
 __copyright__ = "Copyright 2018-2019, Kyonen-no-Project"
-__credits__ = ["Lukman Shaikh", "Keerti Karlingannavar", "Tushar Khot","Sudarshan Parvatikar"]
+__credits__ = ["Lukman Shaikh", "Keerti Karlingannavar", "Tushar Khot", "Sudarshan Parvatikar"]
 __license__ = "MIT"
 __version__ = "0.0.1"
-__maintainer__ = ["Lukman Shaikh", "Keerti Karlingannavar", "Tushar Khot","Sudarshan Parvatikar"]
+__maintainer__ = ["Lukman Shaikh", "Keerti Karlingannavar", "Tushar Khot", "Sudarshan Parvatikar"]
 __email__ = None
 __status__ = "Production"
 
@@ -19,7 +19,8 @@ __status__ = "Production"
 
 from numpy import cos, sin, pi, absolute, pad, arange, asarray, array, log10, array_equal
 from scipy.signal import kaiserord, lfilter, firwin, freqz, iirfilter, freqs, butter, lfilter
-from pylab import figure, clf, plot, xlabel, ylabel, xlim, ylim, title, grid, axes, show, legend, suptitle
+from pylab import figure, clf, plot, xlabel, ylabel, xlim, ylim, title, \
+grid, axes, show, legend, suptitle
 from scipy.io import wavfile
 import matplotlib.pyplot as plt
 from numpy.random import randn
@@ -32,9 +33,9 @@ from random import randint as ri
 #------------------------------------------------------------------------------------------
 input_file = input("Enter the name of the file: ").strip()
 if input_file == "":
-	input_file = "./wav/yahama.wav"
+    input_file = "./wav/yahama.wav"
 else:
-	input_file = "./wav/" + input_file + ".wav"
+    input_file = "./wav/" + input_file + ".wav"
 
 #------------------------------------------------------------------------------------------
 
@@ -55,13 +56,13 @@ t = arange(nsamples) / int(sample_rate)
 # print(">>",len(t))
 
 if len(x) != len(t) and len(x) < len(t):
-	# then pad x
-	# print("here")
-	pad(x, (0, len(t) - len(x)), 'constant')
-	t = t[:len(x)]
+    # then pad x
+    # print("here")
+    pad(x, (0, len(t) - len(x)), 'constant')
+    t = t[:len(x)]
 elif len(t) != len(x) and len(x) > len(t):
-	# then trim x
-	x = x[:len(t)]
+    # then trim x
+    x = x[:len(t)]
 
 original_signal = x[:len(t)]
 x = x[:len(t)] + randn(len(t)) * ri(1,10)
@@ -146,15 +147,15 @@ def upsample(s, n, phase=0):
 
 
 def decimate(s, r, n=None, fir=False):
-    """Decimation - decrease sampling rate by r. The decimation process filters 
-    the input data s with an order n lowpass filter and then resamples the 
-    resulting smoothed signal at a lower rate. By default, decimate employs an 
-    eighth-order lowpass Chebyshev Type I filter with a cutoff frequency of 
-    0.8/r. It filters the input sequence in both the forward and reverse 
-    directions to remove all phase distortion, effectively doubling the filter 
-    order. If 'fir' is set to True decimate uses an order 30 FIR filter (by 
-    default otherwise n), instead of the Chebyshev IIR filter. Here decimate 
-    filters the input sequence in only one direction. This technique conserves 
+    """Decimation - decrease sampling rate by r. The decimation process filters
+    the input data s with an order n lowpass filter and then resamples the
+    resulting smoothed signal at a lower rate. By default, decimate employs an
+    eighth-order lowpass Chebyshev Type I filter with a cutoff frequency of
+    0.8/r. It filters the input sequence in both the forward and reverse
+    directions to remove all phase distortion, effectively doubling the filter
+    order. If 'fir' is set to True decimate uses an order 30 FIR filter (by
+    default otherwise n), instead of the Chebyshev IIR filter. Here decimate
+    filters the input sequence in only one direction. This technique conserves
     memory and is useful for working with long sequences.
     """
     if fir:
@@ -269,235 +270,235 @@ def upfirdn(s, h, p, q):
 
 
 def lowPassFilter(input_signal, nyq_rate, order=11, cutoff_hz=20000.0):
-	# Create a low pass filter with cut off frequency 20k Hz -> pass all freq below 20k Hz
-	# The cutoff frequency of the filter.
-	# cutoff_hz = 20000.0
+    # Create a low pass filter with cut off frequency 20k Hz -> pass all freq below 20k Hz
+    # The cutoff frequency of the filter.
+    # cutoff_hz = 20000.0
 
-	# Use firwin with a Kaiser window to create a lowpass FIR filter.
-	taps = firwin(order, cutoff_hz/nyq_rate, window=('kaiser', beta))
+    # Use firwin with a Kaiser window to create a lowpass FIR filter.
+    taps = firwin(order, cutoff_hz/nyq_rate, window=('kaiser', beta))
 
-	# Use lfilter to filter x with the FIR filter.
-	filtered_x = lfilter(taps, 1.0, input_signal)
+    # Use lfilter to filter x with the FIR filter.
+    filtered_x = lfilter(taps, 1.0, input_signal)
 
-	return filtered_x
+    return filtered_x
 
 #### /Low Pass Filter Block
 
 ### High Pass Filter Block
 
 def highPassFilter(input_signal, nyq_rate, order=11, cutoff_hz=20.0):
-	# Create a High pass filter, with cut off freq 20 Hz -> pass all freq above 20k Hz
-	# The cutoff frequency of the filter.
-	# cutoff_hz = 20.0
+    # Create a High pass filter, with cut off freq 20 Hz -> pass all freq above 20k Hz
+    # The cutoff frequency of the filter.
+    # cutoff_hz = 20.0
 
-	# Use firwin with a Kaiser window to create a lowpass FIR filter.
-	taps = firwin(order, cutoff_hz/nyq_rate, window=('kaiser', beta), pass_zero=False)
+    # Use firwin with a Kaiser window to create a lowpass FIR filter.
+    taps = firwin(order, cutoff_hz/nyq_rate, window=('kaiser', beta), pass_zero=False)
 
-	# Use lfilter to filter x with the FIR filter.
-	filtered_x = lfilter(taps, 1.0, input_signal)
+    # Use lfilter to filter x with the FIR filter.
+    filtered_x = lfilter(taps, 1.0, input_signal)
 
-	return filtered_x
+    return filtered_x
 
 ### /High Pass Filter Block
 
 # ------------------------------------------------------
 
 def cascadedMultiRate(x, nyq_rate, N=11):
-	# Cascaded signal
+    # Cascaded signal
 
-	# Params: x=signal, N=order, nyq_rate = nyquist rate
+    # Params: x=signal, N=order, nyq_rate = nyquist rate
 
-	# Break into cascades into 6 stages, of ranges -> low, high
+    # Break into cascades into 6 stages, of ranges -> low, high
 
-	# Imp: Set rate of downsampling and upsampling to 11
-	downsample_rate = 11
-	upsample_rate = 11
-	filter_length = 9 
+    # Imp: Set rate of downsampling and upsampling to 11
+    downsample_rate = 11
+    upsample_rate = 11
+    filter_length = 9 
 
-	### Stage 1: low = 20.0 Hz, high = 100 Hz
+    ### Stage 1: low = 20.0 Hz, high = 100 Hz
 
-	# 1. Pass Signal via the low pass filter and get output
+    # 1. Pass Signal via the low pass filter and get output
 
-	filtered_signal_lowpass1 = lowPassFilter(x, nyq_rate, order=N, cutoff_hz=100.0) # x: signal, N=order, cutoff_hz=cutoff of LPF(pass signals lower this)
+    filtered_signal_lowpass1 = lowPassFilter(x, nyq_rate, order=N, cutoff_hz=100.0) # x: signal, N=order, cutoff_hz=cutoff of LPF(pass signals lower this)
 
 
-	# 2. Down Sample the flitered signal
+    # 2. Down Sample the flitered signal
 
-	deciminated_signal1 = decimate(filtered_signal_lowpass1, downsample_rate, fir=False) 
+    deciminated_signal1 = decimate(filtered_signal_lowpass1, downsample_rate, fir=False) 
 
 
-	# 3. Upsample/intropolate the filtered signal
+    # 3. Upsample/intropolate the filtered signal
 
-	intropolated_signal1 = interp(deciminated_signal1, upsample_rate, l=filter_length, alpha=0.5) 
+    intropolated_signal1 = interp(deciminated_signal1, upsample_rate, l=filter_length, alpha=0.5) 
 
-	# 4. Pass signal via high pass filter and get output
+    # 4. Pass signal via high pass filter and get output
 
-	filtered_signal_highpass1 = highPassFilter(intropolated_signal1, nyq_rate, order=N, cutoff_hz=20.0)
-	filtered_signal_highpass1 = resample(filtered_signal_highpass1, upsample_rate, downsample_rate)
+    filtered_signal_highpass1 = highPassFilter(intropolated_signal1, nyq_rate, order=N, cutoff_hz=20.0)
+    filtered_signal_highpass1 = resample(filtered_signal_highpass1, upsample_rate, downsample_rate)
 
-	### /Stage 1: low = 20.0 Hz, high = 100 Hz
+    ### /Stage 1: low = 20.0 Hz, high = 100 Hz
 
-	### Stage 2: low = 95.0 Hz, high = 1 kHz
+    ### Stage 2: low = 95.0 Hz, high = 1 kHz
 
-	# 1. Pass Signal via the low pass filter and get output
+    # 1. Pass Signal via the low pass filter and get output
 
-	filtered_signal_lowpass2 = lowPassFilter(x, nyq_rate, order=N, cutoff_hz=1000.0)
+    filtered_signal_lowpass2 = lowPassFilter(x, nyq_rate, order=N, cutoff_hz=1000.0)
 
 
-	# 2. Down Sample the flitered signal
+    # 2. Down Sample the flitered signal
 
-	deciminated_signal2 = decimate(filtered_signal_lowpass2, downsample_rate, fir=False)
+    deciminated_signal2 = decimate(filtered_signal_lowpass2, downsample_rate, fir=False)
 
 
-	# 3. Upsample/intropolate the filtered signal
+    # 3. Upsample/intropolate the filtered signal
 
-	intropolated_signal2 = interp(deciminated_signal2, upsample_rate, l=filter_length, alpha=0.5) 
+    intropolated_signal2 = interp(deciminated_signal2, upsample_rate, l=filter_length, alpha=0.5) 
 
-	# 4. Pass signal via high pass filter and get output
+    # 4. Pass signal via high pass filter and get output
 
-	filtered_signal_highpass2 = highPassFilter(intropolated_signal2, nyq_rate, order=N, cutoff_hz=95.0)
-	filtered_signal_highpass2 = resample(filtered_signal_highpass2, upsample_rate, downsample_rate)
+    filtered_signal_highpass2 = highPassFilter(intropolated_signal2, nyq_rate, order=N, cutoff_hz=95.0)
+    filtered_signal_highpass2 = resample(filtered_signal_highpass2, upsample_rate, downsample_rate)
 
-	### /Stage 2: low = 95.0 Hz, high = 1 kHz
+    ### /Stage 2: low = 95.0 Hz, high = 1 kHz
 
-	### Stage 3: low = 0.9 kHz, high = 5 kHz
+    ### Stage 3: low = 0.9 kHz, high = 5 kHz
 
-	# 1. Pass Signal via the low pass filter and get output
+    # 1. Pass Signal via the low pass filter and get output
 
-	filtered_signal_lowpass3 = lowPassFilter(x, nyq_rate, order=N, cutoff_hz=900.0)
+    filtered_signal_lowpass3 = lowPassFilter(x, nyq_rate, order=N, cutoff_hz=900.0)
 
-	# 2. Down Sample the flitered signal
+    # 2. Down Sample the flitered signal
 
-	deciminated_signal3 = decimate(filtered_signal_lowpass3, downsample_rate, fir=False)
+    deciminated_signal3 = decimate(filtered_signal_lowpass3, downsample_rate, fir=False)
 
 
-	# 3. Upsample/intropolate the filtered signal
+    # 3. Upsample/intropolate the filtered signal
 
-	intropolated_signal3 = interp(deciminated_signal3, upsample_rate, l=filter_length, alpha=0.5)
+    intropolated_signal3 = interp(deciminated_signal3, upsample_rate, l=filter_length, alpha=0.5)
 
-	# 4. Pass signal via high pass filter and get output
+    # 4. Pass signal via high pass filter and get output
 
-	filtered_signal_highpass3 = highPassFilter(intropolated_signal3, nyq_rate, order=N, cutoff_hz=5000.0)
-	filtered_signal_highpass3 = resample(filtered_signal_highpass3, upsample_rate, downsample_rate)
+    filtered_signal_highpass3 = highPassFilter(intropolated_signal3, nyq_rate, order=N, cutoff_hz=5000.0)
+    filtered_signal_highpass3 = resample(filtered_signal_highpass3, upsample_rate, downsample_rate)
 
-	### /Stage 3: low = 0.9 kHz, high = 5 kHz
+    ### /Stage 3: low = 0.9 kHz, high = 5 kHz
 
-	### Stage 4: low = 4.9 kHz, high = 10 kHz
+    ### Stage 4: low = 4.9 kHz, high = 10 kHz
 
-	# 1. Pass Signal via the low pass filter and get output
+    # 1. Pass Signal via the low pass filter and get output
 
-	filtered_signal_lowpass4 = lowPassFilter(x, nyq_rate, order=N, cutoff_hz=4900.0)
+    filtered_signal_lowpass4 = lowPassFilter(x, nyq_rate, order=N, cutoff_hz=4900.0)
 
 
-	# 2. Down Sample the flitered signal
+    # 2. Down Sample the flitered signal
 
-	deciminated_signal4 = decimate(filtered_signal_lowpass4, downsample_rate, fir=False)
+    deciminated_signal4 = decimate(filtered_signal_lowpass4, downsample_rate, fir=False)
 
 
-	# 3. Upsample/intropolate the filtered signal
+    # 3. Upsample/intropolate the filtered signal
 
-	intropolated_signal4 = interp(deciminated_signal4, upsample_rate, l=filter_length, alpha=0.5)
+    intropolated_signal4 = interp(deciminated_signal4, upsample_rate, l=filter_length, alpha=0.5)
 
-	# 4. Pass signal via high pass filter and get output
+    # 4. Pass signal via high pass filter and get output
 
-	filtered_signal_highpass4 = highPassFilter(intropolated_signal4, nyq_rate, order=N, cutoff_hz=10000.0)
-	filtered_signal_highpass4 = resample(filtered_signal_highpass4, upsample_rate, downsample_rate)
+    filtered_signal_highpass4 = highPassFilter(intropolated_signal4, nyq_rate, order=N, cutoff_hz=10000.0)
+    filtered_signal_highpass4 = resample(filtered_signal_highpass4, upsample_rate, downsample_rate)
 
-	### /Stage 4: low = 4.9 kHz, high = 10 kHz
+    ### /Stage 4: low = 4.9 kHz, high = 10 kHz
 
-	### Stage 5: low = 9.9 kHz, high = 15 kHz
+    ### Stage 5: low = 9.9 kHz, high = 15 kHz
 
-	# 1. Pass Signal via the low pass filter and get output
+    # 1. Pass Signal via the low pass filter and get output
 
-	filtered_signal_lowpass5 = lowPassFilter(x, nyq_rate, order=N, cutoff_hz=9900.0)
+    filtered_signal_lowpass5 = lowPassFilter(x, nyq_rate, order=N, cutoff_hz=9900.0)
 
 
-	# 2. Down Sample the flitered signal
+    # 2. Down Sample the flitered signal
 
-	deciminated_signal5 = decimate(filtered_signal_lowpass5, downsample_rate, fir=False)
+    deciminated_signal5 = decimate(filtered_signal_lowpass5, downsample_rate, fir=False)
 
 
-	# 3. Upsample/intropolate the filtered signal
+    # 3. Upsample/intropolate the filtered signal
 
-	intropolated_signal5 = interp(deciminated_signal5, upsample_rate, l=filter_length, alpha=0.5)
+    intropolated_signal5 = interp(deciminated_signal5, upsample_rate, l=filter_length, alpha=0.5)
 
-	# 4. Pass signal via high pass filter and get output
+    # 4. Pass signal via high pass filter and get output
 
-	filtered_signal_highpass5 = highPassFilter(intropolated_signal5, nyq_rate, order=N, cutoff_hz=15000.0)
-	filtered_signal_highpass5 = resample(filtered_signal_highpass5, upsample_rate, downsample_rate)
+    filtered_signal_highpass5 = highPassFilter(intropolated_signal5, nyq_rate, order=N, cutoff_hz=15000.0)
+    filtered_signal_highpass5 = resample(filtered_signal_highpass5, upsample_rate, downsample_rate)
 
-	### /Stage 5: low = 9.9 kHz, 15 kHz
+    ### /Stage 5: low = 9.9 kHz, 15 kHz
 
-	### Stage 6: low = 14.9 kHz, 20 kHz
+    ### Stage 6: low = 14.9 kHz, 20 kHz
 
-	# 1. Pass Signal via the low pass filter and get output
+    # 1. Pass Signal via the low pass filter and get output
 
-	filtered_signal_lowpass6 = lowPassFilter(x, nyq_rate, order=N, cutoff_hz=14900.0)
+    filtered_signal_lowpass6 = lowPassFilter(x, nyq_rate, order=N, cutoff_hz=14900.0)
 
 
-	# 2. Down Sample the flitered signal
+    # 2. Down Sample the flitered signal
 
-	deciminated_signal6 = decimate(filtered_signal_lowpass6, downsample_rate, fir=False)
+    deciminated_signal6 = decimate(filtered_signal_lowpass6, downsample_rate, fir=False)
 
 
-	# 3. Upsample/intropolate the filtered signal
+    # 3. Upsample/intropolate the filtered signal
 
-	intropolated_signal6 = interp(deciminated_signal6, upsample_rate, l=filter_length, alpha=0.5)
+    intropolated_signal6 = interp(deciminated_signal6, upsample_rate, l=filter_length, alpha=0.5)
 
-	# 4. Pass signal via high pass filter and get output
+    # 4. Pass signal via high pass filter and get output
 
-	filtered_signal_highpass6 = highPassFilter(intropolated_signal6, nyq_rate, order=N, cutoff_hz=20000.0)
-	filtered_signal_highpass6 = resample(filtered_signal_highpass6, upsample_rate, downsample_rate)
+    filtered_signal_highpass6 = highPassFilter(intropolated_signal6, nyq_rate, order=N, cutoff_hz=20000.0)
+    filtered_signal_highpass6 = resample(filtered_signal_highpass6, upsample_rate, downsample_rate)
 
-	### /Stage 6: low = 14.9 kHz, high = 20 kHz
+    ### /Stage 6: low = 14.9 kHz, high = 20 kHz
 
 
-	
+    
 
 
-	# 5. Add the signals to get output signals
+    # 5. Add the signals to get output signals
 
-	# output of cascaded mn stages, where the overlapping samples are added
-	cascaded12 = addCascadedOutputs(filtered_signal_highpass1, filtered_signal_highpass2, 5)
-	cascaded123 = addCascadedOutputs(cascaded12, filtered_signal_highpass3, 100)
-	cascaded1234 = addCascadedOutputs(cascaded12, filtered_signal_highpass4, 100)
-	cascaded12345 = addCascadedOutputs(cascaded12, filtered_signal_highpass5, 100)
-	cascaded123456 = addCascadedOutputs(cascaded12, filtered_signal_highpass6, 100)
+    # output of cascaded mn stages, where the overlapping samples are added
+    cascaded12 = addCascadedOutputs(filtered_signal_highpass1, filtered_signal_highpass2, 5)
+    cascaded123 = addCascadedOutputs(cascaded12, filtered_signal_highpass3, 100)
+    cascaded1234 = addCascadedOutputs(cascaded12, filtered_signal_highpass4, 100)
+    cascaded12345 = addCascadedOutputs(cascaded12, filtered_signal_highpass5, 100)
+    cascaded123456 = addCascadedOutputs(cascaded12, filtered_signal_highpass6, 100)
 
-	#----------------------------------------------------------------------------
+    #----------------------------------------------------------------------------
 
-	# return final output
-	# print(len(cascaded123456))
-	
-	return cascaded123456
+    # return final output
+    # print(len(cascaded123456))
+    
+    return cascaded123456
 
 
 
 
 def addCascadedOutputs(list1, list2, m, n=0):
-	# Adds 2 lists as:
-	# newList = list1[:-m] + sum of (list1[-m:], list2[:m]) elements + list2[m:]
+    # Adds 2 lists as:
+    # newList = list1[:-m] + sum of (list1[-m:], list2[:m]) elements + list2[m:]
 
-	# First convert the numpy arrays to lists, add them, return them
-	newList = list(list1[:-m]) + add_elements(list(list1[-m:]), list(list2[:m])) + list(list1[m:])
-	# print(len(list1[:-m]), len(list1[-m:]),len(list2[:m]), len(list1[m:]))
+    # First convert the numpy arrays to lists, add them, return them
+    newList = list(list1[:-m]) + add_elements(list(list1[-m:]), list(list2[:m])) + list(list1[m:])
+    # print(len(list1[:-m]), len(list1[-m:]),len(list2[:m]), len(list1[m:]))
 
-	newList = asarray(newList)
-	# if len(list1) > len(list2):
-	# 	# pad list2 and add
-	# 	pad(list2, (0, len(list1) - len(list2)), 'constant')
-	# elif len(list2) > len(list1):
-	# 	# pad list1 and add
-	# 	pad(list1, (0, len(list2) - len(list1)), 'constant')
-	# newList = list1 + list2
+    newList = asarray(newList)
+    # if len(list1) > len(list2):
+    #   # pad list2 and add
+    #   pad(list2, (0, len(list1) - len(list2)), 'constant')
+    # elif len(list2) > len(list1):
+    #   # pad list1 and add
+    #   pad(list1, (0, len(list2) - len(list1)), 'constant')
+    # newList = list1 + list2
 
-	return newList
+    return newList
 
 
 def add_elements(list1, list2):
-	# adds elements of list1 and 2 parallely
+    # adds elements of list1 and 2 parallely
 
-	return [a + b for a, b in zip(list1, list2)]
+    return [a + b for a, b in zip(list1, list2)]
 
 
 multirate_output = cascadedMultiRate(x, nyq_rate, N=11)
