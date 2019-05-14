@@ -94,8 +94,11 @@ N, beta = kaiserord(ripple_db, width)
 low = 20.0
 high = 20000.0
 
+# For the sake of FIR filter, take order as 11 to get better gain.
+N1 = 11
+
 # Use firwin with a Kaiser window to create a bandpass FIR filter.
-taps = firwin(N, [low/nyq_rate, high/nyq_rate], window=('kaiser', beta))
+taps = firwin(N1, [low/nyq_rate, high/nyq_rate], window=('kaiser', beta))
 
 # Use lfilter to filter x with the FIR filter.
 filtered_x = lfilter(taps, 1.0, x)

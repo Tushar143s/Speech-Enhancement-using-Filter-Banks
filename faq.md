@@ -15,8 +15,11 @@ A. Beacause they are simple to use and hence it is easy to read from and write t
 A. It's 44.1 kHz. Its so, because 44.1 Khz wav files are more abundant, easy to manipulate beacuse of less number of values. Refer `https://docs.scipy.org/doc/scipy/reference/generated/scipy.io.wavfile.read.html#scipy.io.wavfile.read` for more.
 
 5. What is Nyquist rate?
-A.
-
+A. In signal processing, the Nyquist rate, named after Harry Nyquist, is twice the bandwidth of a bandlimited function or a bandlimited channel. This term means two different things under two different circumstances:
+    1. as a lower bound for the sample rate for alias-free signal sampling(not to be confused with the Nyquist frequency, which is half the sampling rate of a discrete-time system) and 
+    2. as an upper bound for the symbol rate across a bandwidth-limited baseband channel such as a telegraph line[2] or passband channel such as a limited radio frequency band or a frequency division multiplex channel.
+   Refer `https://en.wikipedia.org/wiki/Nyquist_rate` for more.
+   
 6. What is the order of the filter?
 A. The order is automatically calculated by the inbuilt function(s), depending upon the input signal. However for FIR filter, in order to maximize gain, we have taken a smaller order of 11.
 
