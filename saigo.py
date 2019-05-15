@@ -507,14 +507,16 @@ multirate_output = cascadedMultiRate(x, nyq_rate, N=11)
 ###########################################################################################################
 
 # write to wavfile
-data2 = asarray(multirate_output[:len(x)], dtype=int16)
-wavfile.write("./multirate_output.wav", 44100, data2)
+
 data2 = asarray(x, dtype=int16)
-wavfile.write("./noisy_signal_output.wav", 44100, data2)
+wavfile.write("./output/1_noisy_signal_output.wav", 44100, data2)
 data2 = asarray(filtered_x, dtype=int16)
-wavfile.write("./fir_output.wav", 44100, data2)
+wavfile.write("./output/2_fir_output.wav", 44100, data2)
 data2 = asarray(iir_output, dtype=int16)
-wavfile.write("./iir_output.wav", 44100, data2)
+wavfile.write("./output/3_iir_output.wav", 44100, data2)
+data2 = asarray(multirate_output[:len(x)], dtype=int16)
+wavfile.write("./output/4_multirate_output.wav", 44100, data2)
+
 
 # Graph Block
 
