@@ -24,7 +24,7 @@ grid, axes, show, legend, suptitle
 from scipy.io import wavfile
 import matplotlib.pyplot as plt
 from numpy.random import randn
-import sys, fractions
+import fractions
 import numpy
 from scipy import signal
 from numpy import cos, sin, pi, absolute, arange, asarray, array, log10, int16
@@ -461,9 +461,9 @@ def cascadedMultiRate(x, nyq_rate, N=11):
     # output of cascaded mn stages, where the overlapping samples are added
     cascaded12 = addCascadedOutputs(filtered_signal_highpass1, filtered_signal_highpass2, 5)
     cascaded123 = addCascadedOutputs(cascaded12, filtered_signal_highpass3, 100)
-    cascaded1234 = addCascadedOutputs(cascaded12, filtered_signal_highpass4, 100)
-    cascaded12345 = addCascadedOutputs(cascaded12, filtered_signal_highpass5, 100)
-    cascaded123456 = addCascadedOutputs(cascaded12, filtered_signal_highpass6, 100)
+    cascaded1234 = addCascadedOutputs(cascaded123, filtered_signal_highpass4, 100)
+    cascaded12345 = addCascadedOutputs(cascaded1234, filtered_signal_highpass5, 100)
+    cascaded123456 = addCascadedOutputs(cascaded12345, filtered_signal_highpass6, 100)
 
     #----------------------------------------------------------------------------
 
