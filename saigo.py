@@ -14,7 +14,7 @@ __maintainer__ = ["Lukman Shaikh", "Keerti Karlingannavar", "Tushar Khot", "Suda
 __email__ = None
 __status__ = "Production"
 
-##############################################################################
+###################################################################################################
 
 import fractions
 from numpy import cos, sin, pi, absolute, pad, arange, asarray, array, log10, array_equal, \
@@ -27,7 +27,7 @@ from pylab import figure, clf, plot, xlabel, ylabel, xlim, ylim, title, \
 from scipy.io import wavfile
 from random import randint as ri
 
-#------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
 
 input_file = input("Enter the name of the file: ").strip()
 if input_file == "":
@@ -35,9 +35,9 @@ if input_file == "":
 else:
     input_file = "./wav/" + input_file + ".wav"
 
-#------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
 
-# Global variables
+### Global variables
 
 # Create a signal for demonstration.
 # sample_rate = 44000
