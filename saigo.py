@@ -14,23 +14,21 @@ __maintainer__ = ["Lukman Shaikh", "Keerti Karlingannavar", "Tushar Khot", "Suda
 __email__ = None
 __status__ = "Production"
 
-
 ##############################################################################
 
-from numpy import cos, sin, pi, absolute, pad, arange, asarray, array, log10, array_equal
-from scipy.signal import kaiserord, lfilter, firwin, freqz, iirfilter, freqs, butter, lfilter
-from pylab import figure, clf, plot, xlabel, ylabel, xlim, ylim, title, \
-grid, axes, show, legend, suptitle
-from scipy.io import wavfile
-import matplotlib.pyplot as plt
-from numpy.random import randn
 import fractions
-import numpy
-from scipy import signal
-from numpy import cos, sin, pi, absolute, arange, asarray, array, log10, int16
+from numpy import cos, sin, pi, absolute, pad, arange, asarray, array, log10, array_equal, \
+     roll, kron, zeros, ceil, arange, sinc, kaiser, floor, mod, r_, int16
+from numpy.random import randn
+from scipy.signal import kaiserord, lfilter, firwin, freqz, iirfilter, freqs, butter, cheby1, \
+     kaiser_beta, fftconvolve
+from pylab import figure, clf, plot, xlabel, ylabel, xlim, ylim, title, \
+     grid, axes, show, legend, suptitle
+from scipy.io import wavfile
 from random import randint as ri
 
 #------------------------------------------------------------------------------------------
+
 input_file = input("Enter the name of the file: ").strip()
 if input_file == "":
     input_file = "./wav/yahama.wav"
@@ -142,7 +140,7 @@ def downsample(s, n, phase=0):
 def upsample(s, n, phase=0):
     """Increase sampling rate by integer factor n  with included offset phase.
     """
-    return numpy.roll(numpy.kron(s, numpy.r_[1, numpy.zeros(int(n)-1)]), phase)
+    return roll(kron(s, r_[1, zeros(int(n)-1)]), phase)
 
 
 
@@ -161,14 +159,14 @@ def decimate(s, r, n=None, fir=False):
     if fir:
         if n is None:
             n = 30
-        b = signal.firwin(n, 1.0/r)
+        b = firwin(n, 1.0/r)
         a = 1
-        f = signal.lfilter(b, a, s)
+        f = lfilter(b, a, s)
     else: #iir
         if n is None:
             n = 8
-        b, a = signal.cheby1(n, 0.05, 0.8/r)
-        f = signal.lfilter(b, a, s)
+        b, a = cheby1(n, 0.05, 0.8/r)
+        f = lfilter(b, a, s)
     return downsample(f, r)
 
 
@@ -186,9 +184,9 @@ def interp(s, r, l=11, alpha=0.5):
     Nyquist frequency). The default value for l is 4 and the default value for 
     alpha is 0.5.
     """
-    b = signal.firwin(2*l*r+1, alpha/r);
+    b = firwin(2*l*r+1, alpha/r);
     a = 1
-    return r*signal.lfilter(b, a, upsample(s, r))[r*l+1:-1]
+    return r*lfilter(b, a, upsample(s, r))[r*l+1:-1]
 
 
 def resample(s, p, q, h=None):
@@ -219,33 +217,33 @@ def resample(s, p, q, h=None):
         #determine filter length
         #use empirical formula from [2] Chap 7, Eq. (7.63) p 476
         rejection_db = -20.0*log10_rejection;
-        l = numpy.ceil((rejection_db-8.0) / (28.714 * roll_off_width))
+        l = ceil((rejection_db-8.0) / (28.714 * roll_off_width))
   
         #ideal sinc filter
-        t = numpy.arange(-l, l + 1)
-        ideal_filter=2*p*stopband_cutoff_f*numpy.sinc(2*stopband_cutoff_f*t)  
+        t = arange(-l, l + 1)
+        ideal_filter=2*p*stopband_cutoff_f*sinc(2*stopband_cutoff_f*t)  
   
         #determine parameter of Kaiser window
         #use empirical formula from [2] Chap 7, Eq. (7.62) p 474
-        beta = signal.kaiser_beta(rejection_db)
+        beta = kaiser_beta(rejection_db)
           
         #apodize ideal filter response
-        h = numpy.kaiser(2*l+1, beta)*ideal_filter
+        h = kaiser(2*l+1, beta)*ideal_filter
 
     ls = len(s)
     lh = len(h)
 
     l = (lh - 1)/2.0
-    ly = numpy.ceil(ls*p/float(q))
+    ly = ceil(ls*p/float(q))
 
     #pre and postpad filter response
-    nz_pre = numpy.floor(q - numpy.mod(l,q))
+    nz_pre = floor(q - mod(l,q))
     nz_pre = int(nz_pre)
     hpad = h[-lh+nz_pre:]
 
-    offset = numpy.floor((l+nz_pre)/q)
+    offset = floor((l+nz_pre)/q)
     nz_post = 0;
-    while numpy.ceil(((ls-1)*p + nz_pre + lh + nz_post )/q ) - offset < ly:
+    while ceil(((ls-1)*p + nz_pre + lh + nz_post )/q ) - offset < ly:
         nz_post += 1
     hpad = hpad[:lh + nz_pre + nz_post]
 
@@ -260,7 +258,7 @@ def upfirdn(s, h, p, q):
     downsample by q. Using fftconvolve as opposed to lfilter as it does not seem
     to do a full convolution operation (and its much faster than convolve).
     """
-    return downsample(signal.fftconvolve(h, upsample(s, p)), q)
+    return downsample(fftconvolve(h, upsample(s, p)), q)
 
 ##################################################################################
 
