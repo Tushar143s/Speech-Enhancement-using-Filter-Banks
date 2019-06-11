@@ -31,8 +31,10 @@ from random import randint as ri
 
 input_file = input("Enter the name of the file: ").strip()
 if input_file == "":
+    # if no input file is given, assume the default
     input_file = "./wav/yahama.wav"
 else:
+    # append wav extension to the given filename
     input_file = "./wav/" + input_file + ".wav"
 
 #---------------------------------------------------------------------------------------------------
@@ -75,7 +77,6 @@ ripple_db = 60.0
 N, beta = kaiserord(ripple_db, width)
 
 # The cutoff frequency of the filter.
-# cutoff_hz = 10.0
 low = 20.0
 high = 20000.0
 
@@ -87,7 +88,6 @@ taps = firwin(N1, [low/nyq_rate, high/nyq_rate], window=('kaiser', beta))
 
 # Use lfilter to filter x with the FIR filter.
 filtered_x = lfilter(taps, 1.0, x)
-
 
 #-------------------------------------------------------------------------
 
@@ -107,7 +107,6 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order=1):
     b, a = butter_bandpass(lowcut, highcut, fs, order=order)
     y = lfilter(b, a, data)
     return y
-
 
 iir_output = butter_bandpass_filter(x, low, high, sample_rate)
 
@@ -248,10 +247,7 @@ def upfirdn(s, h, p, q):
 
 ##################################################################################
 
-
-
 ### Low Pass Filter Block
-
 
 def lowPassFilter(input_signal, nyq_rate, order=11, cutoff_hz=20000.0):
     # Create a low pass filter with cut off frequency 20k Hz -> pass all freq below 20k Hz
@@ -436,10 +432,6 @@ def cascadedMultiRate(x, nyq_rate, N=11):
 
     ### /Stage 6: low = 14.9 kHz, high = 20 kHz
 
-
-    
-
-
     # 5. Add the signals to get output signals
 
     # output of cascaded mn stages, where the overlapping samples are added
@@ -453,32 +445,24 @@ def cascadedMultiRate(x, nyq_rate, N=11):
 
     return cascaded123456
 
-
-
-
 def addCascadedOutputs(list1, list2, m, n=0):
     # Adds 2 lists as:
     # newList = list1[:-m] + sum of (list1[-m:], list2[:m]) elements + list2[m:]
-
     # First convert the numpy arrays to lists, add them, return them
     newList = list(list1[:-m]) + add_elements(list(list1[-m:]), list(list2[:m])) + list(list1[m:])
     newList = asarray(newList)
     return newList
-
 
 def add_elements(list1, list2):
     # adds elements of list1 and 2 parallely
 
     return [a + b for a, b in zip(list1, list2)]
 
-
 multirate_output = cascadedMultiRate(x, nyq_rate, N=11)
-
 
 ###########################################################################################################
 
 # write to wavfile
-
 data2 = asarray(x, dtype=int16)
 wavfile.write("./output/1_noisy_signal_output.wav", 44100, data2)
 data2 = asarray(filtered_x, dtype=int16)
@@ -488,11 +472,9 @@ wavfile.write("./output/3_iir_output.wav", 44100, data2)
 data2 = asarray(multirate_output[:len(x)], dtype=int16)
 wavfile.write("./output/4_multirate_output.wav", 44100, data2)
 
-
 # Graph Block
 
 # 1. Original vs Noisy
-
 figure(1)
 # Plot the original signal.
 plot(t, original_signal, 'b', label='original signal')
@@ -572,6 +554,7 @@ ylabel('amplitude')
 grid(True)
 suptitle("Original Signal and Multirate filter output")
 
+# Display the graphs
 show()
 
 # End of code
