@@ -102,3 +102,10 @@ celerybeat-schedule
 
 # mypy
 .mypy_cache/
+
+#output files
+output/
+output/*
+
+# any wav files
+.*wav

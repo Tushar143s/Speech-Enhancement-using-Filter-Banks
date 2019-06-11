@@ -17,6 +17,7 @@ __status__ = "Production"
 ###################################################################################################
 
 import fractions
+import warnings
 from numpy import cos, sin, pi, absolute, pad, arange, asarray, array, log10, array_equal, \
      roll, kron, zeros, ceil, arange, sinc, kaiser, floor, mod, r_, int16
 from numpy.random import randn
@@ -27,6 +28,7 @@ from pylab import figure, clf, plot, xlabel, ylabel, xlim, ylim, title, \
 from scipy.io import wavfile
 from random import randint as ri
 
+warnings.filterwarnings("ignore")
 #---------------------------------------------------------------------------------------------------
 
 input_file = input("Enter the name of the file: ").strip()
