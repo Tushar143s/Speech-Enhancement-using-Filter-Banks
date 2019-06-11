@@ -40,22 +40,12 @@ else:
 ### Global variables
 
 # Create a signal for demonstration.
-# sample_rate = 44000
-# nsamples = 44000 * 4
 sample_rate, x = wavfile.read(input_file)
-# print(sample_rate)
-# sample_rate = 44000
 nsamples = 4 * int(sample_rate)
 t = arange(nsamples) / int(sample_rate)
-# x = cos(2*pi*0.5*t) + 0.2*sin(2*pi*2.5*t+0.1) + \
-#         0.2*sin(2*pi*15.3*t) + 0.1*sin(2*pi*16.7*t + 0.1) + \
-#             0.1*sin(2*pi*23.45*t+.8)
-# print("<<<", len(x))
-# print(">>",len(t))
 
 if len(x) != len(t) and len(x) < len(t):
     # then pad x
-    # print("here")
     pad(x, (0, len(t) - len(x)), 'constant')
     t = t[:len(x)]
 elif len(t) != len(x) and len(x) > len(t):
@@ -65,10 +55,6 @@ elif len(t) != len(x) and len(x) > len(t):
 original_signal = x[:len(t)]
 x = x[:len(t)] + randn(len(t)) * ri(1,10)
 x = x[:len(t)]
-# print(">>>>", len(x), "<<<", len(t))
-# print(array_equal(original_signal, x))
-
-
 
 # The Nyquist rate of the signal.
 nyq_rate = sample_rate / 2.0
@@ -465,9 +451,6 @@ def cascadedMultiRate(x, nyq_rate, N=11):
 
     #----------------------------------------------------------------------------
 
-    # return final output
-    # print(len(cascaded123456))
-    
     return cascaded123456
 
 
@@ -479,17 +462,7 @@ def addCascadedOutputs(list1, list2, m, n=0):
 
     # First convert the numpy arrays to lists, add them, return them
     newList = list(list1[:-m]) + add_elements(list(list1[-m:]), list(list2[:m])) + list(list1[m:])
-    # print(len(list1[:-m]), len(list1[-m:]),len(list2[:m]), len(list1[m:]))
-
     newList = asarray(newList)
-    # if len(list1) > len(list2):
-    #   # pad list2 and add
-    #   pad(list2, (0, len(list1) - len(list2)), 'constant')
-    # elif len(list2) > len(list1):
-    #   # pad list1 and add
-    #   pad(list1, (0, len(list2) - len(list1)), 'constant')
-    # newList = list1 + list2
-
     return newList
 
 
@@ -521,8 +494,6 @@ wavfile.write("./output/4_multirate_output.wav", 44100, data2)
 # 1. Original vs Noisy
 
 figure(1)
-
-
 # Plot the original signal.
 plot(t, original_signal, 'b', label='original signal')
 # Plot Noisy signal
@@ -534,17 +505,12 @@ grid(True)
 suptitle("Original Signal vs Noisy Signal")
 
 # 2. FIR vs IIR
-
 figure(2)
 # delay for FIRs
 delay = 0.5 * (N-1) / sample_rate
 
 # Plot the original signal.
 plot(t, original_signal, 'b', label='original signal')
-# # Plot Noisy signal
-# plot(t, x, label='noisy signal')
-# # Plot the filtered signal, shifted to compensate for the phase delay.
-# plot(t-delay, filtered_x, 'r-', label='shifted signal')
 # Plot just the "good" part of the filtered signal.  The first N-1
 # samples are "corrupted" by the initial conditions.
 plot(t[N-1:]-delay, filtered_x[N-1:], 'r', label='Filtered Signal of Bandpass FIR filter')
@@ -559,8 +525,6 @@ suptitle("Original Signal, FIR filter and IIR filter outputs")
 figure(3)
 # Plot the original signal.
 plot(t, original_signal, 'b', label='original signal')
-# # Plot Noisy signal
-# plot(t, x, label='noisy signal')
 # Plot Multirate output
 plot(t, iir_output, 'y', label='Filtered Signal of Bandpass IIR filter')
 # Plot Fir Output
@@ -575,7 +539,6 @@ suptitle("Original Signal and IIR filter output")
 figure(4)
 # Plot the original signal.
 plot(t, original_signal, 'b', label='original signal')
-
 # Plot Multirate output
 plot(t, multirate_output[:len(t)], 'g', label='Filtered Signal of Cascaded Multirate filter')
 plot(t, iir_output, 'y', label='Filtered Signal of Bandpass IIR filter')
@@ -586,7 +549,6 @@ grid(True)
 suptitle("Original Signal, IIR filter and Multirate filter outputs")
 
 # 5. Noisy vs Multirate
-
 figure(5)
 # Plot Noisy signal
 plot(t, x, 'c', label='noisy signal')
@@ -599,11 +561,9 @@ grid(True)
 suptitle("Noisy Signal and Multirate filter output")
 
 # 6. Original vs Multirate
-
 figure(6)
 # Plot the original signal.
 plot(t, original_signal, 'b', label='original signal')
-
 # Plot Multirate output
 plot(t, multirate_output[:len(t)], 'g', label='Filtered Signal of Cascaded Multirate filter')
 legend()
@@ -611,7 +571,6 @@ xlabel('time')
 ylabel('amplitude')
 grid(True)
 suptitle("Original Signal and Multirate filter output")
-
 
 show()
 
