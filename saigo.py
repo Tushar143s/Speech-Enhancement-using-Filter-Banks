@@ -489,13 +489,14 @@ suptitle("Original Signal vs Noisy Signal")
 # 2. FIR vs IIR
 figure(2)
 # delay for FIRs
-delay = 0.5 * (N-1) / sample_rate
+# delay = 0.5 * (N-1) / sample_rate
 
 # Plot the original signal.
 plot(t, original_signal, 'b', label='original signal')
 # Plot just the "good" part of the filtered signal.  The first N-1
 # samples are "corrupted" by the initial conditions.
-plot(t[N-1:]-delay, filtered_x[N-1:], 'r', label='Filtered Signal of Bandpass FIR filter')
+# plot(t[N-1:]-delay, filtered_x[N-1:], 'r', label='Filtered Signal of Bandpass FIR filter')
+plot(t[N-1:], filtered_x[N-1:], 'r', label='Filtered Signal of Bandpass FIR filter')
 plot(t, iir_output, 'y', label='Filtered Signal of Bandpass IIR filter')
 legend()
 xlabel('time')
