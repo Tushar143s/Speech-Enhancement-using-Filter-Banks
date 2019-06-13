@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-This script contains functions relating to Finite Impulse Response Filter
+Final Year project on Speech enhancement using filter banks
 """
 
 # Script details
