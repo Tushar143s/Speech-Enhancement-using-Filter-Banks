@@ -1,4 +1,4 @@
-# kyonen-no-project
+# Speech Enhancement using Filter Banks
 The final year project
 
 
@@ -11,3 +11,6 @@ The final year project
 3. Enter the name of the wav file from the samples in `wav/` directory. If no name is given, default one is assumed.
 4. The relevant graphs will then show up. 
 5. Upon closing all the graphs, the filtered output of all the filters are exported to individual wav files and can be played for confirmation of the working of the filters.
+
+# Misc
+See `Final Report.rar` for the project's report.
